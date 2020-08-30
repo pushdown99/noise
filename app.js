@@ -5,7 +5,7 @@ var fileUpload  = require('express-fileupload');
 var router      = express.Router();
 var app         = express();
 var moment      = require('moment-timezone');
-var port        = process.env.PORT || 3000;
+var port        = process.env.PORT || 9900;
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
@@ -22,7 +22,7 @@ app.use(express.static(__dirname + '/public'));
 //
 app.use(function (req, res, next) {
     req.timestamp  = moment().unix();
-    req.receivedAt = moment().tz('Asia/Seoul').format('YYYY-MM-DD hh:mm:ss');
+    req.receivedAt = moment().tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
     console.log(req.receivedAt + ': ', req.method, req.protocol +'://' + req.hostname + req.url);
   
     return next();
@@ -65,20 +65,14 @@ app.route('/noise')
   });
 
 app.post('/upload', function(req, res) {
+    console.log(req);
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).send('No files were uploaded.');
     }
     let sampleFile = req.files.sampleFile;
     console.log(sampleFile);
   
-    fs.mkdir('data', function(e) {
-        if(!e || (e && e.code == 'EEXIST')) {
-
-        } else {
-            console.log(e);
-        }
-    });
-    sampleFile.mv(path.resolve(__dirname, './public/data', moment().unix() + '.jpg'), function(err) {
+    sampleFile.mv(path.resolve(__dirname, './public/data', moment().tz('Asia/Seoul').format('YYYYMMDD-HHmmss') + '.jpg'), function(err) {
       if (err)
         return res.status(500).send(err);
   
